@@ -1,10 +1,12 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
-import { R3DM, R3DMProps } from '../src';
+import { React3DMicro } from '../src';
+import ViewProps = React3DMicro.ViewProps;
+import View = React3DMicro.View;
 
 const meta: Meta = {
-  title: 'R3DM',
-  component: R3DM,
+  title: 'View',
+  component: View,
   argTypes: {
     children: {
       control: {
@@ -19,7 +21,7 @@ const meta: Meta = {
 
 export default meta;
 
-const Template: Story<R3DMProps> = args => <R3DM {...args} />;
+const Template: Story<ViewProps> = (args) => <View {...args} />;
 
 export const Default = Template.bind({});
 

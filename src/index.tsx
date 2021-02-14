@@ -1,24 +1,21 @@
-import React, {FC, HTMLAttributes} from 'react';
+import React, { FC, HTMLAttributes } from 'react';
 
-export type R3DMPathProps = HTMLAttributes<SVGPathElement> & {};
+export namespace React3DMicro {
+  export type PathProps = HTMLAttributes<SVGPathElement> & {};
 
-export const R3DMPath: FC<R3DMPathProps> = ({
-                                                ...props
-                                            }) => {
-    return <path {...props}/>;
-};
+  export const Path: FC<PathProps> = ({ ...props }) => {
+    return <path {...props} />;
+  };
 
-export type R3DMGroupProps = HTMLAttributes<SVGGElement> & {};
+  export type GroupProps = HTMLAttributes<SVGGElement> & {};
 
-export const R3DMGroup: FC<R3DMGroupProps> = ({children, ...props}) => {
+  export const Group: FC<GroupProps> = ({ children, ...props }) => {
     return <g {...props}>{children}</g>;
-};
+  };
 
-export type R3DMProps = HTMLAttributes<SVGElement> & {}
+  export type ViewProps = HTMLAttributes<SVGElement> & {};
 
-export const R3DM: FC<R3DMProps> = ({
-                                        children,
-                                        ...props
-                                    }) => {
+  export const View: FC<ViewProps> = ({ children, ...props }) => {
     return <svg {...props}>{children}</svg>;
-};
+  };
+}
