@@ -1,6 +1,6 @@
 import React, { FC, HTMLAttributes } from 'react';
 
-export namespace React3DMicro {
+export namespace R3DM {
   export type PathProps = HTMLAttributes<SVGPathElement> & {};
 
   export const Path: FC<PathProps> = ({ ...props }) => {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
-import { React3DMicro } from '../src';
-import ViewProps = React3DMicro.ViewProps;
-import View = React3DMicro.View;
+import { R3DM } from '../src';
+import ViewProps = R3DM.ViewProps;
+import View = R3DM.View;
 
 const meta: Meta = {
   title: 'View',
