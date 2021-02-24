@@ -1,19 +1,29 @@
-input -> commands
+input -> optional_white_space commands optional_white_space
+
+white_space -> [ \t]
+
+divider
+    -> ","
+    |  white_space:+
+
+optional_white_space -> white_space:*
 
 digit -> [0-9]
 
-commandName -> [a-zA-Z]
+digits -> digit:+
 
 decimal -> "."
 
-digits
-    -> digit
-    |  digits
+operator
+    -> "+"
+    |  "-"
 
 value
     -> digits
     |  decimal digits
     |  digits decimal digits
+    |  operator digits
+    |  operator decimal digits
     |  operator digits decimal digits
 
 values
@@ -21,20 +31,10 @@ values
     | value values
     | value divider values
 
+commandName -> [a-zA-Z]
+
 command
     -> commandName values
-    |  commandName _ values
+    |  commandName optional_white_space values
 
-commands
-    -> command
-    | command commands
-
-operator
-    -> "+"
-    |  "-"
-
-divider
-    -> ","
-    |  _
-
-_ -> [ \t]:*
+commands -> command:+
