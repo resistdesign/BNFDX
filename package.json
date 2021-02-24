@@ -13,9 +13,11 @@
     "node": ">=10"
   },
   "scripts": {
+    "build:svg-parser": "nearleyc ./svg-parser/path-d.ne -o ./svg-parser/path-d.js",
     "start": "tsdx watch",
     "build": "tsdx build",
-    "test": "tsdx test --passWithNoTests",
+    "test": "tsdx test './src/**/*.spec.ts' --passWithNoTests",
+    "test:svg-parser": "tsdx test './svg-parser/**/*.spec.ts' --passWithNoTests",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
@@ -58,10 +60,12 @@
     "@storybook/addon-links": "^6.1.18",
     "@storybook/addons": "^6.1.18",
     "@storybook/react": "^6.1.18",
+    "@types/nearley": "^2.11.1",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
     "babel-loader": "^8.2.2",
     "husky": "^5.0.9",
+    "nearley": "^2.20.1",
     "prettier": "^2.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -69,6 +73,8 @@
     "size-limit": "^4.9.2",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
-    "typescript": "^4.1.5"
-  }
+    "typescript": "^4.1.5",
+    "yarn": "^1.22.10"
+  },
+  "dependencies": {}
 }
