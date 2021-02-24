@@ -37,6 +37,9 @@ describe('Path D', () => {
     const grammar = compileGrammar(PathDDef);
     const parser = new Parser(Grammar.fromCompiled(grammar));
 
+    console.log('Parser Created');
+    console.log('Parsing Grammar Example...');
+
     parser.feed(DemoPathD);
 
     const results = parser.results;

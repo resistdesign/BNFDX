@@ -1,6 +1,8 @@
+input -> commands
+
 digit -> [0-9]
 
-command -> [a-zA-Z]
+commandName -> [a-zA-Z]
 
 decimal -> "."
 
@@ -10,6 +12,7 @@ digits
 
 value
     -> digits
+    |  decimal digits
     |  digits decimal digits
     |  operator digits decimal digits
 
@@ -18,7 +21,13 @@ values
     | value values
     | value divider values
 
-command-with-values -> command values
+command
+    -> commandName values
+    |  commandName _ values
+
+commands
+    -> command
+    | command commands
 
 operator
     -> "+"
@@ -26,4 +35,6 @@ operator
 
 divider
     -> ","
-    |  " "
+    |  _
+
+_ -> [ \t]:*
