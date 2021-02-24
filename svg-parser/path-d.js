@@ -33,9 +33,9 @@ var grammar = {
     {"name": "commandName", "symbols": [/[a-zA-Z]/]},
     {"name": "command", "symbols": ["commandName", "values"]},
     {"name": "command", "symbols": ["commandName", "optional_white_space", "values"]},
-    {"name": "commands$ebnf$1", "symbols": ["command"]},
-    {"name": "commands$ebnf$1", "symbols": ["commands$ebnf$1", "command"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "commands", "symbols": ["commands$ebnf$1"]}
+    {"name": "commands", "symbols": ["command"]},
+    {"name": "commands", "symbols": ["command", "commands"]},
+    {"name": "commands", "symbols": ["command", "optional_white_space", "commands"]}
 ]
   , ParserStart: "input"
 }

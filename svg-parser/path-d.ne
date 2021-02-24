@@ -37,4 +37,7 @@ command
     -> commandName values
     |  commandName optional_white_space values
 
-commands -> command:+
+commands
+    -> command
+    |  command commands
+    |  command optional_white_space commands
