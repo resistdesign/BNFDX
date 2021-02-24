@@ -1,8 +1,11 @@
 import Path from 'path';
 import FS from 'fs';
 import { CompiledRules, Grammar, Parser } from 'nearley';
+// @ts-ignore
 import compile from 'nearley/lib/compile';
+// @ts-ignore
 import generate from 'nearley/lib/generate';
+// @ts-ignore
 import nearleyGrammar from 'nearley/lib/nearley-language-bootstrapped';
 
 function compileGrammar(sourceCode: string): CompiledRules {
