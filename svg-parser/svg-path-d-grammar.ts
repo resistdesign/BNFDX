@@ -46,6 +46,6 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SvgPathDGrammarMapType> = {
 };
 
 export const SVGPathDGrammar: Grammar<SvgPathDGrammarMapType> = {
-  entry: 'command',
+  entry: 'input',
   map: SVGPathDGrammarMap,
 };
