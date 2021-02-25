@@ -1,14 +1,14 @@
-svg-path ::=
+svg-path:
     wsp* moveto-drawto-command-groups? wsp*
-moveto-drawto-command-groups ::=
+moveto-drawto-command-groups:
     moveto-drawto-command-group
     | moveto-drawto-command-group wsp* moveto-drawto-command-groups
-moveto-drawto-command-group ::=
+moveto-drawto-command-group:
     moveto wsp* drawto-commands?
-drawto-commands ::=
+drawto-commands:
     drawto-command
     | drawto-command wsp* drawto-commands
-drawto-command ::=
+drawto-command:
     closepath
     | lineto
     | horizontal-lineto
@@ -18,95 +18,95 @@ drawto-command ::=
     | quadratic-bezier-curveto
     | smooth-quadratic-bezier-curveto
     | elliptical-arc
-moveto ::=
+moveto:
     ( "M" | "m" ) wsp* moveto-argument-sequence
-moveto-argument-sequence ::=
+moveto-argument-sequence:
     coordinate-pair
     | coordinate-pair comma-wsp? lineto-argument-sequence
-closepath ::=
+closepath:
     ("Z" | "z")
-lineto ::=
+lineto:
     ( "L" | "l" ) wsp* lineto-argument-sequence
-lineto-argument-sequence ::=
+lineto-argument-sequence:
     coordinate-pair
     | coordinate-pair comma-wsp? lineto-argument-sequence
-horizontal-lineto ::=
+horizontal-lineto:
     ( "H" | "h" ) wsp* horizontal-lineto-argument-sequence
-horizontal-lineto-argument-sequence ::=
+horizontal-lineto-argument-sequence:
     coordinate
     | coordinate comma-wsp? horizontal-lineto-argument-sequence
-vertical-lineto ::=
+vertical-lineto:
     ( "V" | "v" ) wsp* vertical-lineto-argument-sequence
-vertical-lineto-argument-sequence ::=
+vertical-lineto-argument-sequence:
     coordinate
     | coordinate comma-wsp? vertical-lineto-argument-sequence
-curveto ::=
+curveto:
     ( "C" | "c" ) wsp* curveto-argument-sequence
-curveto-argument-sequence ::=
+curveto-argument-sequence:
     curveto-argument
     | curveto-argument comma-wsp? curveto-argument-sequence
-curveto-argument ::=
+curveto-argument:
     coordinate-pair comma-wsp? coordinate-pair comma-wsp? coordinate-pair
-smooth-curveto ::=
+smooth-curveto:
     ( "S" | "s" ) wsp* smooth-curveto-argument-sequence
-smooth-curveto-argument-sequence ::=
+smooth-curveto-argument-sequence:
     smooth-curveto-argument
     | smooth-curveto-argument comma-wsp? smooth-curveto-argument-sequence
-smooth-curveto-argument ::=
+smooth-curveto-argument:
     coordinate-pair comma-wsp? coordinate-pair
-quadratic-bezier-curveto ::=
+quadratic-bezier-curveto:
     ( "Q" | "q" ) wsp* quadratic-bezier-curveto-argument-sequence
-quadratic-bezier-curveto-argument-sequence ::=
+quadratic-bezier-curveto-argument-sequence:
     quadratic-bezier-curveto-argument
     | quadratic-bezier-curveto-argument comma-wsp?
         quadratic-bezier-curveto-argument-sequence
-quadratic-bezier-curveto-argument ::=
+quadratic-bezier-curveto-argument:
     coordinate-pair comma-wsp? coordinate-pair
-smooth-quadratic-bezier-curveto ::=
+smooth-quadratic-bezier-curveto:
     ( "T" | "t" ) wsp* smooth-quadratic-bezier-curveto-argument-sequence
-smooth-quadratic-bezier-curveto-argument-sequence ::=
+smooth-quadratic-bezier-curveto-argument-sequence:
     coordinate-pair
     | coordinate-pair comma-wsp? smooth-quadratic-bezier-curveto-argument-sequence
-elliptical-arc ::=
+elliptical-arc:
     ( "A" | "a" ) wsp* elliptical-arc-argument-sequence
-elliptical-arc-argument-sequence ::=
+elliptical-arc-argument-sequence:
     elliptical-arc-argument
     | elliptical-arc-argument comma-wsp? elliptical-arc-argument-sequence
-elliptical-arc-argument ::=
+elliptical-arc-argument:
     nonnegative-number comma-wsp? nonnegative-number comma-wsp?
         number comma-wsp flag comma-wsp? flag comma-wsp? coordinate-pair
-coordinate-pair ::=
+coordinate-pair:
     coordinate comma-wsp? coordinate
-coordinate ::=
+coordinate:
     number
-nonnegative-number ::=
+nonnegative-number:
     integer-constant
     | floating-point-constant
-number ::=
+number:
     sign? integer-constant
     | sign? floating-point-constant
-flag ::=
+flag:
     "0" | "1"
-comma-wsp ::=
+comma-wsp:
     (wsp+ comma? wsp*) | (comma wsp*)
-comma ::=
+comma:
     ","
-integer-constant ::=
+integer-constant:
     digit-sequence
-floating-point-constant ::=
+floating-point-constant:
     fractional-constant exponent?
     | digit-sequence exponent
-fractional-constant ::=
+fractional-constant:
     digit-sequence? "." digit-sequence
     | digit-sequence "."
-exponent ::=
+exponent:
     ( "e" | "E" ) sign? digit-sequence
-sign ::=
+sign:
     "+" | "-"
-digit-sequence ::=
+digit-sequence:
     digit
     | digit digit-sequence
-digit ::=
+digit:
     "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-wsp ::=
+wsp:
     " " | "\t" | "\n"
