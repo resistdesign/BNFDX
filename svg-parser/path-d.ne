@@ -1,6 +1,6 @@
 input -> optional_white_space commands optional_white_space
 
-white_space -> [ \t]
+white_space -> [ \t\n]
 
 divider
     -> ","
@@ -41,3 +41,5 @@ commands
     -> command
     |  command commands
     |  command optional_white_space commands
+
+# TODO: Add transformers!
