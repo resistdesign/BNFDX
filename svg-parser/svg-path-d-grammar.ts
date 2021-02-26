@@ -1,22 +1,21 @@
 import { BaseGrammarMapType, Grammar } from './syntax-string-parser';
 
-type SvgPathDGrammarMapType = {
-  input: any;
-  digit: any;
-  digit_set: any;
-  white_space: any;
-  optional_white_space: any;
-  one_or_more_white_space: any;
-  decimal: any;
-  operator: any;
-  divider: any;
-  value: any;
-  value_set: any;
-  command: any;
-  command_value_set_group: any;
-};
+type SVGPathDTokenTypes =
+  | 'input'
+  | 'digit'
+  | 'digit_set'
+  | 'white_space'
+  | 'optional_white_space'
+  | 'one_or_more_white_space'
+  | 'decimal'
+  | 'operator'
+  | 'divider'
+  | 'value'
+  | 'value_set'
+  | 'command'
+  | 'command_value_set_group';
 
-const SVGPathDGrammarMap: BaseGrammarMapType<SvgPathDGrammarMapType> = {
+const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
   input: ['optional_white_space', 'command_value_set_group', 'optional_white_space'],
   digit: /[0-9]/,
   digit_set: ['digit', ['digit', 'digit_set']],
@@ -42,10 +41,10 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SvgPathDGrammarMapType> = {
   ],
   value_set: ['value', ['value', 'divider', 'value_set']],
   command: /[a-z]/i,
-  command_value_set_group: ['command', 'optional_white_space', 'value_set'],
+  command_value_set_group: ['command', 'optional_white_space', 'value_set_x' /* looking for error */],
 };
 
-export const SVGPathDGrammar: Grammar<SvgPathDGrammarMapType> = {
-  entry: 'input',
+export const SVGPathDGrammar: Grammar<SVGPathDTokenTypes> = {
+  entry: 'taco', // looking for error
   map: SVGPathDGrammarMap,
 };
