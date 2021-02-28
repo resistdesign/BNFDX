@@ -17,7 +17,16 @@ type SVGPathDTokenTypes =
 
 const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
   input: {
-    options: [['optional_white_space', 'command_value_set_group', 'optional_white_space']],
+    options: [
+      [
+        'optional_white_space',
+        {
+          value: 'command_value_set_group',
+          option: TokenProcessorOptionTypes.ZERO_OR_MORE,
+        },
+        'optional_white_space',
+      ],
+    ],
   },
   digit: {
     options: [/[0-9]/],

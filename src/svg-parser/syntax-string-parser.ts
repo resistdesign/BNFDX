@@ -29,6 +29,7 @@ export type AST<TokenTypes extends string> = {
   endIndex: number;
   tokenType: TokenTypes;
   value: string | AST<TokenTypes>[];
+  valueLength: number;
 };
 
 type TokenValidationProcessorReturnValue<TokenTypes extends string> = AST<TokenTypes> | false;
@@ -64,6 +65,7 @@ const PROCESS_REGEX: TokenValidationProcessor = <TokenTypes extends string>(
           startIndex: currentIndex,
           endIndex: currentIndex + (firstMatch.length - 1),
           value: firstMatch,
+          valueLength: firstMatch.length,
           tokenType,
         };
       }
@@ -88,9 +90,9 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
       const resultAst = processTokenValidator<TokenTypes>(syntaxString, tokenType, tokenValidator, grammarMap, latestCurrentIndex);
 
       if (resultAst) {
-        const { endIndex } = resultAst;
+        const { valueLength } = resultAst;
 
-        latestCurrentIndex = endIndex + 1;
+        latestCurrentIndex += valueLength;
 
         results.push(resultAst);
       } else {
@@ -107,6 +109,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
             startIndex: currentIndex,
             endIndex: latestCurrentIndex - 1,
             value: results,
+            valueLength: results.reduce((acc, { valueLength: vL }) => acc + vL, 0),
             tokenType: tokenType,
           }
       : // IMPORTANT: This processor is ALWAYS VALID, but it can return an "empty" result.
@@ -115,6 +118,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
           startIndex: currentIndex,
           endIndex: currentIndex,
           value: '',
+          valueLength: 0,
           tokenType,
         };
   },
@@ -133,9 +137,9 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
       const resultAst = processTokenValidator<TokenTypes>(syntaxString, tokenType, tokenValidator, grammarMap, latestCurrentIndex);
 
       if (resultAst) {
-        const { endIndex } = resultAst;
+        const { valueLength } = resultAst;
 
-        latestCurrentIndex = endIndex + 1;
+        latestCurrentIndex += valueLength;
 
         results.push(resultAst);
       } else {
@@ -152,6 +156,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
             startIndex: currentIndex,
             endIndex: latestCurrentIndex - 1,
             value: results,
+            valueLength: results.reduce((acc, { valueLength: vL }) => acc + vL, 0),
             tokenType: tokenType,
           }
       : // IMPORTANT: This processor is ONLY VALID if there is AT LEAST ONE result.
@@ -179,9 +184,9 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
 
           break;
         } else {
-          const { endIndex } = resultAst;
+          const { valueLength } = resultAst;
 
-          latestCurrentIndex = endIndex + 1;
+          latestCurrentIndex += valueLength;
 
           singleResult = resultAst;
         }
@@ -197,6 +202,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
             startIndex: currentIndex,
             endIndex: currentIndex,
             value: '',
+            valueLength: 0,
             tokenType,
           }
         : // ONE RESULT
@@ -220,6 +226,7 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
       startIndex: currentIndex,
       endIndex: currentIndex,
       value: '',
+      valueLength: 0,
       tokenType,
     };
   }
@@ -239,9 +246,9 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
           const result = processTokenValidator<TokenTypes>(syntaxString, tokenType, t, grammarMap, latestCurrentIndex);
 
           if (result) {
-            const { endIndex } = result;
+            const { valueLength } = result;
 
-            latestCurrentIndex = endIndex + 1;
+            latestCurrentIndex += valueLength;
 
             resultList.push(result);
           } else {
@@ -258,6 +265,7 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
               startIndex: currentIndex,
               endIndex: latestCurrentIndex - 1,
               value: resultList,
+              valueLength: resultList.reduce((acc, { valueLength: vL }) => acc + vL, 0),
               tokenType,
             };
       }
@@ -267,6 +275,7 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
         startIndex: currentIndex,
         endIndex: currentIndex,
         value: '',
+        valueLength: 0,
         tokenType,
       };
     }
