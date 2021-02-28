@@ -10,7 +10,7 @@ describe('SVG Parser', () => {
     test('should enable parsing of path d commands', () => {
       const result = parseSyntaxString(DEMO_PATH_D, SVGPathDGrammar);
 
-      console.log('SVG Path D AST', JSON.stringify(result, null, 2));
+      console.log('SVG Path D AST:', JSON.stringify(result, null, 2));
 
       expect(result).toBeTruthy();
     });
