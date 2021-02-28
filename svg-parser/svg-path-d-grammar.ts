@@ -16,32 +16,52 @@ type SVGPathDTokenTypes =
   | 'command_value_set_group';
 
 const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
-  input: ['optional_white_space', 'command_value_set_group', 'optional_white_space'],
-  digit: /[0-9]/,
-  digit_set: ['digit', ['digit', 'digit_set']],
-  white_space: [/ /, /\t/, /\n/],
+  input: {
+    options: [['optional_white_space', 'command_value_set_group', 'optional_white_space']],
+  },
+  digit: {
+    options: [/[0-9]/],
+  },
+  digit_set: {
+    options: ['digit', ['digit', 'digit_set']],
+  },
+  white_space: { options: [/ /, /\t/, /\n/] },
   optional_white_space: {
-    value: 'white_space',
-    option: TokenProcessorOptionTypes['*'],
+    options: [
+      {
+        value: 'white_space',
+        option: TokenProcessorOptionTypes['*'],
+      },
+    ],
   },
   one_or_more_white_space: {
-    value: 'white_space',
-    option: TokenProcessorOptionTypes['+'],
+    options: [
+      {
+        value: 'white_space',
+        option: TokenProcessorOptionTypes['+'],
+      },
+    ],
   },
-  decimal: /\./,
-  operator: [/\+/, /-/],
-  divider: [/,/, 'one_or_more_white_space', 'operator', 'decimal'],
-  value: [
-    'digit_set',
-    ['operator', 'digit_set'],
-    ['decimal', 'digit_set'],
-    ['operator', 'decimal', 'digit_set'],
-    ['digit_set', 'decimal', 'digit_set'],
-    ['operator', 'digit_set', 'decimal', 'digit_set'],
-  ],
-  value_set: ['value', ['value', 'divider', 'value_set']],
-  command: /[a-z]/i,
-  command_value_set_group: ['command', 'optional_white_space', 'value_set_x' /* looking for error */],
+  decimal: { options: [/\./] },
+  operator: { options: [/\+/, /-/] },
+  divider: { options: [/,/, 'one_or_more_white_space', 'operator', 'decimal'] },
+  value: {
+    options: [
+      'digit_set',
+      ['operator', 'digit_set'],
+      ['decimal', 'digit_set'],
+      ['operator', 'decimal', 'digit_set'],
+      ['digit_set', 'decimal', 'digit_set'],
+      ['operator', 'digit_set', 'decimal', 'digit_set'],
+    ],
+  },
+  value_set: { options: ['value', ['value', 'divider', 'value_set']] },
+  command: {
+    options: [/[a-z]/i],
+  },
+  command_value_set_group: {
+    options: [['command', 'optional_white_space', 'value_set_x' /* looking for error */]],
+  },
 };
 
 export const SVGPathDGrammar: Grammar<SVGPathDTokenTypes> = {
