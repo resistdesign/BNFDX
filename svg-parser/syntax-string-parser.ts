@@ -253,40 +253,19 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
     }
   } else if (tokenValidator instanceof RegExp) {
     // RegExp: Direct compare.
-    const result = PROCESS_REGEX(syntaxString, tokenType, currentIndex, tokenValidator);
-
-    if (result) {
-      const { consumedString, newCurrentIndex } = result;
-
-      return {
-        startIndex: currentIndex,
-        endIndex: newCurrentIndex - 1,
-        tokenType: tokenType,
-        value: consumedString,
-      };
-    }
+    return PROCESS_REGEX<TokenTypes>(syntaxString, tokenType, tokenValidator, grammarMap, currentIndex);
   } else if (tokenValidator instanceof Object) {
     // Use a TokenValidatorOptionProcessor
     const { value: t, option } = tokenValidator;
     const optionProcessor = TOKEN_VALIDATOR_OPTION_PROCESSORS[option];
-    const result = optionProcessor<TokenTypes>(syntaxString, currentIndex, t);
 
-    if (result) {
-      const { consumedString, newCurrentIndex } = result;
-
-      return {
-        startIndex: currentIndex,
-        endIndex: newCurrentIndex - 1,
-        value: consumedString,
-        tokenType,
-      };
-    }
+    return optionProcessor<TokenTypes>(syntaxString, tokenType, t, grammarMap, currentIndex);
   } else {
     // string: Get from map
     const { options = [] } = grammarMap[tokenValidator];
 
     for (const t of options) {
-      // TRICKY: Here, the new `tokenType` in the `tokenValidator` which is a string.
+      // TRICKY: Here, the new `tokenType` parameter IS the `tokenValidator`, which is a string.
       const result = processTokenValidator(syntaxString, tokenValidator, t, grammarMap, currentIndex);
 
       if (result) {
