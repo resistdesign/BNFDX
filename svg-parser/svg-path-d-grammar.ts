@@ -30,7 +30,7 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     options: [
       {
         value: 'white_space',
-        option: TokenProcessorOptionTypes['*'],
+        option: TokenProcessorOptionTypes.ZERO_OR_MORE,
       },
     ],
   },
@@ -38,7 +38,7 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     options: [
       {
         value: 'white_space',
-        option: TokenProcessorOptionTypes['+'],
+        option: TokenProcessorOptionTypes.ONE_OR_MORE,
       },
     ],
   },
@@ -60,11 +60,11 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     options: [/[a-z]/i],
   },
   command_value_set_group: {
-    options: [['command', 'optional_white_space', 'value_set_x' /* looking for error */]],
+    options: [['command', 'optional_white_space', 'value_set']],
   },
 };
 
 export const SVGPathDGrammar: Grammar<SVGPathDTokenTypes> = {
-  entry: 'taco', // looking for error
+  entry: 'input',
   map: SVGPathDGrammarMap,
 };
