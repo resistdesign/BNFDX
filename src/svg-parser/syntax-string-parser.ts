@@ -204,12 +204,22 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
 };
 
 const processTokenValidator: TokenValidationProcessor = <TokenTypes extends string>(
-  syntaxString: string,
+  syntaxString: string = '',
   tokenType: TokenTypes,
   tokenValidator: TokenValidator<TokenTypes>,
   grammarMap: BaseGrammarMapType<TokenTypes>,
   currentIndex: number
 ): AST<TokenTypes> | false => {
+  if (currentIndex >= syntaxString.length - 1) {
+    // End Of Input
+    return {
+      startIndex: currentIndex,
+      endIndex: currentIndex,
+      value: '',
+      tokenType,
+    };
+  }
+
   if (tokenValidator instanceof Array) {
     if (tokenValidator.length > 0) {
       // A combination of types.
