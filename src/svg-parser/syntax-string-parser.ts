@@ -278,8 +278,9 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
   } else {
     // string: Get from map
     const { options = [] } = grammarMap[tokenValidator];
+    const reverseOptions = [...options].reverse();
 
-    for (const t of options) {
+    for (const t of reverseOptions) {
       // TRICKY: Here, the new `tokenType` parameter IS the `tokenValidator`, which is a string.
       const result = processTokenValidator<TokenTypes>(syntaxString, tokenValidator, t, grammarMap, currentIndex);
 

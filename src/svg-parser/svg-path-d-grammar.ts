@@ -48,11 +48,11 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
   value: {
     options: [
       'digit_set',
-      ['operator', 'digit_set'],
-      ['decimal', 'digit_set'],
-      ['operator', 'decimal', 'digit_set'],
       ['digit_set', 'decimal', 'digit_set'],
+      ['decimal', 'digit_set'],
+      ['operator', 'digit_set'],
       ['operator', 'digit_set', 'decimal', 'digit_set'],
+      ['operator', 'decimal', 'digit_set'],
     ],
   },
   value_set: { options: ['value', ['value', 'divider', 'value_set']] },
