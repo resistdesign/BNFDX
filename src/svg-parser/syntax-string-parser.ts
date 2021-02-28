@@ -81,7 +81,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
     let latestCurrentIndex = currentIndex;
 
     while (true) {
-      const resultAst = processTokenValidator(syntaxString, tokenType, tokenValidator, grammarMap, latestCurrentIndex);
+      const resultAst = processTokenValidator<TokenTypes>(syntaxString, tokenType, tokenValidator, grammarMap, latestCurrentIndex);
 
       if (resultAst) {
         const { endIndex } = resultAst;
@@ -126,7 +126,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
     let latestCurrentIndex = currentIndex;
 
     while (true) {
-      const resultAst = processTokenValidator(syntaxString, tokenType, tokenValidator, grammarMap, latestCurrentIndex);
+      const resultAst = processTokenValidator<TokenTypes>(syntaxString, tokenType, tokenValidator, grammarMap, latestCurrentIndex);
 
       if (resultAst) {
         const { endIndex } = resultAst;
@@ -166,7 +166,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
       tooManyResults: boolean = false;
 
     for (let i = 0; i < 2; i++) {
-      const resultAst = processTokenValidator(syntaxString, tokenType, tokenValidator, grammarMap, latestCurrentIndex);
+      const resultAst = processTokenValidator<TokenTypes>(syntaxString, tokenType, tokenValidator, grammarMap, latestCurrentIndex);
 
       if (resultAst) {
         // IMPORTANT: Check for a second result, if it is found, then this processor is invalid.
@@ -222,36 +222,41 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
 
   if (tokenValidator instanceof Array) {
     if (tokenValidator.length > 0) {
-      // A combination of types.
-      const resultList = [];
+      if (tokenValidator[0] === tokenType) {
+        // IMPORTANT: Disallow direct recursion.
+        return false;
+      } else {
+        // A combination of types.
+        const resultList = [];
 
-      let latestCurrentIndex: number = currentIndex;
+        let latestCurrentIndex: number = currentIndex;
 
-      for (const t of tokenValidator) {
-        const result = processTokenValidator<TokenTypes>(syntaxString, tokenType, t, grammarMap, latestCurrentIndex);
+        for (const t of tokenValidator) {
+          const result = processTokenValidator<TokenTypes>(syntaxString, tokenType, t, grammarMap, latestCurrentIndex);
 
-        if (result) {
-          const { endIndex } = result;
+          if (result) {
+            const { endIndex } = result;
 
-          latestCurrentIndex = endIndex + 1;
+            latestCurrentIndex = endIndex + 1;
 
-          resultList.push(result);
-        } else {
-          // IMPORTANT: There was a MATCH MISS and this combination of token types is INVALID.
-          return false;
+            resultList.push(result);
+          } else {
+            // IMPORTANT: There was a MATCH MISS and this combination of token types is INVALID.
+            return false;
+          }
         }
-      }
 
-      return resultList.length === 1
-        ? // ONE TOKEN TYPE WITH ONE RESULT
-          resultList[0]
-        : // MULTIPLE TOKEN TYPES WITH MULTIPLE RESULTS
-          {
-            startIndex: currentIndex,
-            endIndex: latestCurrentIndex - 1,
-            value: resultList,
-            tokenType,
-          };
+        return resultList.length === 1
+          ? // ONE TOKEN TYPE WITH ONE RESULT
+            resultList[0]
+          : // MULTIPLE TOKEN TYPES WITH MULTIPLE RESULTS
+            {
+              startIndex: currentIndex,
+              endIndex: latestCurrentIndex - 1,
+              value: resultList,
+              tokenType,
+            };
+      }
     } else {
       // TRICKY: `tokenValidator` is an empty array, technically a match because "all" validators in the array are NOT `false`, so an "empty" result is returned.
       return {
@@ -276,7 +281,7 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
 
     for (const t of options) {
       // TRICKY: Here, the new `tokenType` parameter IS the `tokenValidator`, which is a string.
-      const result = processTokenValidator(syntaxString, tokenValidator, t, grammarMap, currentIndex);
+      const result = processTokenValidator<TokenTypes>(syntaxString, tokenValidator, t, grammarMap, currentIndex);
 
       if (result) {
         return result;
@@ -290,5 +295,5 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
 export const parseSyntaxString = <TokenTypes extends string>(syntaxString: string = '', grammar: Grammar<TokenTypes>): AST<TokenTypes> | false => {
   const { entry, map } = grammar;
 
-  return processTokenValidator(syntaxString, entry, entry, map, 0);
+  return processTokenValidator<TokenTypes>(syntaxString, entry, entry, map, 0);
 };
