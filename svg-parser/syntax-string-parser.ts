@@ -211,21 +211,46 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
   currentIndex: number
 ): AST<TokenTypes> | false => {
   if (tokenValidator instanceof Array) {
-    // A combination of types.
-    const resultList = [];
+    if (tokenValidator.length > 0) {
+      // A combination of types.
+      const resultList = [];
 
-    for (const t of tokenValidator) {
-      // TODO: Increment the `currentIndex`.
-      const result = processTokenValidator<TokenTypes>(syntaxString, tokenType, t, grammarMap, currentIndex);
+      let latestCurrentIndex: number = currentIndex;
 
-      if (!result) {
-        return false;
+      for (const t of tokenValidator) {
+        const result = processTokenValidator<TokenTypes>(syntaxString, tokenType, t, grammarMap, latestCurrentIndex);
+
+        if (result) {
+          const { endIndex } = result;
+
+          latestCurrentIndex = endIndex + 1;
+
+          resultList.push(result);
+        } else {
+          // IMPORTANT: There was a MATCH MISS and this combination of token types is INVALID.
+          return false;
+        }
       }
 
-      resultList.push(result);
+      return resultList.length === 1
+        ? // ONE TOKEN TYPE WITH ONE RESULT
+          resultList[0]
+        : // MULTIPLE TOKEN TYPES WITH MULTIPLE RESULTS
+          {
+            startIndex: currentIndex,
+            endIndex: latestCurrentIndex - 1,
+            value: resultList,
+            tokenType,
+          };
+    } else {
+      // TRICKY: `tokenValidator` is an empty array, technically a match because "all" validators in the array are NOT `false`, so an "empty" result is returned.
+      return {
+        startIndex: currentIndex,
+        endIndex: currentIndex,
+        value: '',
+        tokenType,
+      };
     }
-
-    return resultList;
   } else if (tokenValidator instanceof RegExp) {
     // RegExp: Direct compare.
     const result = PROCESS_REGEX(syntaxString, tokenType, currentIndex, tokenValidator);
