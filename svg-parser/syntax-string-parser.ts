@@ -11,8 +11,12 @@ export type TokenValidatorOptionsConfig<TokenTypes extends string> = {
 
 export type TokenValidator<TokenTypes extends string> = TokenTypes | RegExp | TokenValidatorOptionsConfig<TokenTypes> | TokenValidator<TokenTypes>[];
 
+export type GrammarMapTokenTypeDescriptor<TokenTypes extends string> = {
+  options: TokenValidator<TokenTypes>[];
+};
+
 export type BaseGrammarMapType<TokenTypes extends string> = {
-  [type in TokenTypes]: TokenValidator<TokenTypes>;
+  [type in TokenTypes]: GrammarMapTokenTypeDescriptor<TokenTypes>;
 };
 
 export type Grammar<TokenTypes extends string> = {
@@ -88,14 +92,19 @@ const processTokenValidator = <TokenTypes extends string>(
 ): AST<TokenTypes> | false => {
   if (tokenValidator instanceof Array) {
     // A combination of types.
+    const resultList = [];
+
     for (const t of tokenValidator) {
       const result = processTokenValidator<TokenTypes>(syntaxString, tokenType, t, grammarMap, currentIndex);
 
-      // TODO: This is wrong, it needs to be treated as an AND.
-      if (result) {
-        return result;
+      if (!result) {
+        return false;
       }
+
+      resultList.push(result);
     }
+
+    return resultList;
   } else if (tokenValidator instanceof RegExp) {
     // RegExp: Direct compare.
     const result = PROCESS_REGEX(syntaxString, tokenType, currentIndex, tokenValidator);
@@ -128,11 +137,16 @@ const processTokenValidator = <TokenTypes extends string>(
     }
   } else {
     // string: Get from map
-    const t = grammarMap[tokenValidator];
+    const { options = [] } = grammarMap[tokenValidator];
 
-    // TODO: Consider a list of options. An array of OR token validators.
+    for (const t of options) {
+      // TRICKY: Here, the new `tokenType` in the `tokenValidator` which is a string.
+      const result = processTokenValidator(syntaxString, tokenValidator, t, grammarMap, currentIndex);
 
-    return processTokenValidator(syntaxString, tokenValidator, t, grammarMap, currentIndex);
+      if (result) {
+        return result;
+      }
+    }
   }
 
   return false;
