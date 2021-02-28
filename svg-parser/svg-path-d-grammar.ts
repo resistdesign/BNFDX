@@ -1,4 +1,4 @@
-import { BaseGrammarMapType, Grammar } from './syntax-string-parser';
+import { BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from './syntax-string-parser';
 
 type SVGPathDTokenTypes =
   | 'input'
@@ -22,11 +22,11 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
   white_space: [/ /, /\t/, /\n/],
   optional_white_space: {
     value: 'white_space',
-    option: '*',
+    option: TokenProcessorOptionTypes['*'],
   },
   one_or_more_white_space: {
     value: 'white_space',
-    option: '+',
+    option: TokenProcessorOptionTypes['+'],
   },
   decimal: /\./,
   operator: [/\+/, /-/],
