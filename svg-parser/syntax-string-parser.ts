@@ -28,7 +28,7 @@ export type AST<TokenTypes extends string> = {
   startIndex: number;
   endIndex: number;
   tokenType: TokenTypes;
-  value: string | AST<TokenTypes> | AST<TokenTypes>[];
+  value: string | AST<TokenTypes>[];
 };
 
 type TokenValidationProcessorReturnValue<TokenTypes extends string> = AST<TokenTypes> | false;
@@ -95,13 +95,18 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
     }
 
     return results.length > 0
-      ? {
-          startIndex: currentIndex,
-          endIndex: latestCurrentIndex - 1,
-          value: results,
-          tokenType: tokenType,
-        }
+      ? results.length === 1
+        ? // ONE RESULT
+          results[0]
+        : // MULTIPLE RESULTS
+          {
+            startIndex: currentIndex,
+            endIndex: latestCurrentIndex - 1,
+            value: results,
+            tokenType: tokenType,
+          }
       : // IMPORTANT: This processor is ALWAYS VALID, but it can return an "empty" result.
+        // ZERO RESULTS
         {
           startIndex: currentIndex,
           endIndex: currentIndex,
@@ -135,13 +140,18 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
     }
 
     return results.length > 0
-      ? {
-          startIndex: currentIndex,
-          endIndex: latestCurrentIndex - 1,
-          value: results,
-          tokenType: tokenType,
-        }
+      ? results.length === 1
+        ? // ONE RESULT
+          results[0]
+        : // MULTIPLE RESULTS
+          {
+            startIndex: currentIndex,
+            endIndex: latestCurrentIndex - 1,
+            value: results,
+            tokenType: tokenType,
+          }
       : // IMPORTANT: This processor is ONLY VALID if there is AT LEAST ONE result.
+        // ZERO RESULTS
         false;
   },
   [TokenProcessorOptionTypes.ZERO_OR_ONE]: <TokenTypes extends string>(
@@ -188,6 +198,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
         : // ONE RESULT
           singleResult
       : // IMPORTANT: This processor is ONLY VALID if there is ONLY ZERO results OR ONLY ONE result.
+        // TOO MANY RESULTS (More than 1)
         false;
   },
 };
