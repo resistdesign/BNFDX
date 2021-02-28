@@ -54,15 +54,19 @@ const PROCESS_REGEX: TokenValidationProcessor = <TokenTypes extends string>(
     const stringFromIndex = syntaxString.slice(currentIndex);
     const match = stringFromIndex.match(tokenValidator);
 
-    if (match) {
-      const consumedString = match[0] || '';
+    if (match && match.length > 0) {
+      const firstMatch = match[0] || '';
 
-      return {
-        startIndex: currentIndex,
-        endIndex: currentIndex + (consumedString.length - 1),
-        value: consumedString,
-        tokenType,
-      };
+      // TRICKY: IMPORTANT: Make sure the match is at the beginning of the string being searched.
+      // WARNING: Unwanted recursion could occur without this check.
+      if (!!firstMatch && stringFromIndex.indexOf(firstMatch) === 0) {
+        return {
+          startIndex: currentIndex,
+          endIndex: currentIndex + (firstMatch.length - 1),
+          value: firstMatch,
+          tokenType,
+        };
+      }
     }
   }
 
