@@ -64,7 +64,9 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
       ['operator', 'decimal', 'digit_set'],
     ],
   },
-  value_set: { options: ['value', ['value', 'divider', 'value_set']] },
+  value_set: {
+    options: ['value', ['value', 'value_set'], ['value', 'divider', 'value_set']],
+  },
   command: {
     options: [/[a-z]/i],
   },
