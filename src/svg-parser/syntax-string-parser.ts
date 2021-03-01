@@ -44,6 +44,8 @@ type TokenValidatorOptionProcessorMap = {
   [key in TokenProcessorOptionTypes]: TokenValidationProcessor;
 };
 
+const IS_END_OF_INPUT = (syntaxString: string = '', currentIndex: number = 0) => currentIndex >= syntaxString.length - 1;
+
 const PROCESS_REGEX: TokenValidationProcessor = <TokenTypes extends string>(
   syntaxString: string,
   tokenType: TokenTypes,
@@ -95,6 +97,10 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
         latestCurrentIndex += valueLength;
 
         results.push(resultAst);
+
+        if (IS_END_OF_INPUT(syntaxString, latestCurrentIndex)) {
+          break;
+        }
       } else {
         break;
       }
@@ -142,6 +148,10 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
         latestCurrentIndex += valueLength;
 
         results.push(resultAst);
+
+        if (IS_END_OF_INPUT(syntaxString, latestCurrentIndex)) {
+          break;
+        }
       } else {
         break;
       }
@@ -189,6 +199,10 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
           latestCurrentIndex += valueLength;
 
           singleResult = resultAst;
+
+          if (IS_END_OF_INPUT(syntaxString, latestCurrentIndex)) {
+            break;
+          }
         }
       } else {
         break;
@@ -219,28 +233,20 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
   tokenValidator: TokenValidator<TokenTypes>,
   grammarMap: BaseGrammarMapType<TokenTypes>,
   currentIndex: number
-): AST<TokenTypes> | false => {
-  if (currentIndex >= syntaxString.length - 1) {
-    // End Of Input
-    return {
-      startIndex: currentIndex,
-      endIndex: currentIndex,
-      value: '',
-      valueLength: 0,
-      tokenType,
-    };
-  }
+): TokenValidationProcessorReturnValue<TokenTypes> => {
+  let ast: TokenValidationProcessorReturnValue<TokenTypes> = false;
 
   if (tokenValidator instanceof Array) {
     if (tokenValidator.length > 0) {
       if (tokenValidator[0] === tokenType) {
         // IMPORTANT: Disallow direct recursion.
-        return false;
+        ast = false;
       } else {
         // A combination of types.
         const resultList = [];
 
-        let latestCurrentIndex: number = currentIndex;
+        let latestCurrentIndex: number = currentIndex,
+          missMatch: boolean = false;
 
         for (const t of tokenValidator) {
           const result = processTokenValidator<TokenTypes>(syntaxString, tokenType, t, grammarMap, latestCurrentIndex);
@@ -251,27 +257,41 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
             latestCurrentIndex += valueLength;
 
             resultList.push(result);
+
+            if (IS_END_OF_INPUT(syntaxString, latestCurrentIndex)) {
+              // IMPORTANT: There is not a full match for this token type combination if not all parts of the
+              // `tokenValidator` were available before the end of the input.
+              missMatch = resultList.length < tokenValidator.length;
+
+              break;
+            }
           } else {
             // IMPORTANT: There was a MATCH MISS and this combination of token types is INVALID.
-            return false;
+            ast = false;
+            missMatch = true;
+
+            break;
           }
         }
 
-        return resultList.length === 1
-          ? // ONE TOKEN TYPE WITH ONE RESULT
-            resultList[0]
-          : // MULTIPLE TOKEN TYPES WITH MULTIPLE RESULTS
-            {
-              startIndex: currentIndex,
-              endIndex: latestCurrentIndex - 1,
-              value: resultList,
-              valueLength: resultList.reduce((acc, { valueLength: vL }) => acc + vL, 0),
-              tokenType,
-            };
+        if (!missMatch) {
+          ast =
+            resultList.length === 1
+              ? // ONE TOKEN TYPE WITH ONE RESULT
+                resultList[0]
+              : // MULTIPLE TOKEN TYPES WITH MULTIPLE RESULTS
+                {
+                  startIndex: currentIndex,
+                  endIndex: latestCurrentIndex - 1,
+                  value: resultList,
+                  valueLength: resultList.reduce((acc, { valueLength: vL }) => acc + vL, 0),
+                  tokenType,
+                };
+        }
       }
     } else {
       // TRICKY: `tokenValidator` is an empty array, technically a match because "all" validators in the array are NOT `false`, so an "empty" result is returned.
-      return {
+      ast = {
         startIndex: currentIndex,
         endIndex: currentIndex,
         value: '',
@@ -281,13 +301,13 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
     }
   } else if (tokenValidator instanceof RegExp) {
     // RegExp: Direct compare.
-    return PROCESS_REGEX<TokenTypes>(syntaxString, tokenType, tokenValidator, grammarMap, currentIndex);
+    ast = PROCESS_REGEX<TokenTypes>(syntaxString, tokenType, tokenValidator, grammarMap, currentIndex);
   } else if (tokenValidator instanceof Object) {
     // Use a TokenValidatorOptionProcessor
     const { value: t, option } = tokenValidator;
     const optionProcessor = TOKEN_VALIDATOR_OPTION_PROCESSORS[option];
 
-    return optionProcessor<TokenTypes>(syntaxString, tokenType, t, grammarMap, currentIndex);
+    ast = optionProcessor<TokenTypes>(syntaxString, tokenType, t, grammarMap, currentIndex);
   } else {
     // string: Get from map
     const { options = [] } = grammarMap[tokenValidator];
@@ -298,12 +318,14 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
       const result = processTokenValidator<TokenTypes>(syntaxString, tokenValidator, t, grammarMap, currentIndex);
 
       if (result) {
-        return result;
+        ast = result;
+
+        break;
       }
     }
   }
 
-  return false;
+  return ast;
 };
 
 export const parseSyntaxString = <TokenTypes extends string>(syntaxString: string = '', grammar: Grammar<TokenTypes>): AST<TokenTypes> | false => {

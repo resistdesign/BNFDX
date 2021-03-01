@@ -1,6 +1,6 @@
 import { BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from './syntax-string-parser';
 
-type SVGPathDTokenTypes =
+export type SVGPathDTokenTypes =
   | 'input'
   | 'digit'
   | 'digit_set'
@@ -21,7 +21,7 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
       [
         'optional_white_space',
         {
-          value: 'command_value_set_group',
+          value: ['command_value_set_group', 'optional_white_space'],
           option: TokenProcessorOptionTypes.ZERO_OR_MORE,
         },
         'optional_white_space',
