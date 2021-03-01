@@ -1,6 +1,6 @@
 import Path from 'path';
 import FS from 'fs';
-import { AST, parseSyntaxString, transformAST } from './syntax-string-parser';
+import { AST, astToSyntaxString, parseSyntaxString, transformAST } from './syntax-string-parser';
 import { SVGPathDASTTransformMap, SVGPathDGrammar, SVGPathDTokenTypes } from './svg-path-d-grammar';
 
 const DEMO_PATH_D: string = FS.readFileSync(Path.join(__dirname, 'demo-path-d.txt'), { encoding: 'utf8' });
@@ -18,6 +18,14 @@ describe('SVG Parser', () => {
       const result = transformAST(PATH_D_AST as AST<SVGPathDTokenTypes>, SVGPathDASTTransformMap);
 
       expect(result).toBeTruthy();
+    });
+  });
+
+  describe('SVG Path D astToSyntaxString', () => {
+    test('should convert an AST back to the exact, origin syntax string it had been generated from', () => {
+      const result = astToSyntaxString(PATH_D_AST as AST<SVGPathDTokenTypes>);
+
+      expect(result).toStrictEqual(DEMO_PATH_D);
     });
   });
 });

@@ -361,3 +361,15 @@ export const transformAST = <TokenTypes extends string>(
 
   return transform ? transform(astWithTransformedValue, valueIndex) : astWithTransformedValue;
 };
+
+export const astToSyntaxString = <TokenTypes extends string>(ast: AST<TokenTypes> | AST<TokenTypes>['value']): string => {
+  if (ast instanceof Array) {
+    return ast.map(astToSyntaxString as any).join('');
+  } else if (ast instanceof Object) {
+    const { value } = ast;
+
+    return astToSyntaxString(value);
+  } else {
+    return ast;
+  }
+};
