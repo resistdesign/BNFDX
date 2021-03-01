@@ -344,7 +344,7 @@ export type ASTWithTransformedValue<TokenTypes extends string> = AST<TokenTypes>
 export type ASTTransform<TokenTypes extends string> = (astWithTransformedValue: ASTWithTransformedValue<TokenTypes>, valueIndex: number) => any;
 
 export type ASTTransformMap<TokenTypes extends string> = {
-  [type in TokenTypes]: ASTTransform<TokenTypes>;
+  [type in TokenTypes]?: ASTTransform<TokenTypes>;
 };
 
 export const transformAST = <TokenTypes extends string>(

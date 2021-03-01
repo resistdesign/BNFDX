@@ -1,4 +1,4 @@
-import { BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from './syntax-string-parser';
+import { ASTTransformMap, BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from './syntax-string-parser';
 
 export type SVGPathDTokenTypes =
   | 'input'
@@ -78,4 +78,20 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
 export const SVGPathDGrammar: Grammar<SVGPathDTokenTypes> = {
   entry: 'input',
   map: SVGPathDGrammarMap,
+};
+
+export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
+  white_space: () => '',
+  optional_white_space: () => '',
+  one_or_more_white_space: () => '',
+  divider: () => '',
+  command: ({ value }) => value,
+  command_value_set_group: ({ transformedValue: [command, ...coordinates] = [] }) => ({ command, coordinates }),
+  input: ({ transformedValue }) => transformedValue,
+  operator: ({ value }) => value,
+  decimal: ({ value }) => value,
+  digit: ({ value }) => value,
+  digit_set: ({ transformedValue = [] }) => transformedValue.join(''),
+  value: ({ transformedValue = [] }) => parseFloat(transformedValue.join('')),
+  value_set: ({ transformedValue = [] }) => transformedValue,
 };
