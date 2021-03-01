@@ -17,8 +17,6 @@ describe('SVG Parser', () => {
     test('should enable transforming path d ASTs to command-coordinate structures', () => {
       const result = transformAST(PATH_D_AST as AST<SVGPathDTokenTypes>, SVGPathDASTTransformMap);
 
-      console.log('SVG Path D Command-Coordinates:', JSON.stringify(result, null, 2));
-
       expect(result).toBeTruthy();
     });
   });
