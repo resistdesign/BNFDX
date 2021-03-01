@@ -68,10 +68,10 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     options: ['value', ['value', 'value_set'], ['value', 'divider', 'value_set']],
   },
   command: {
-    options: [/[a-z]/i],
+    options: [/[mzlhvcsqtaMZLHVCSQTA]/i],
   },
   command_value_set_group: {
-    options: [['command', 'optional_white_space', 'value_set']],
+    options: ['command', ['command', 'optional_white_space', 'value_set']],
   },
 };
 
@@ -93,8 +93,8 @@ export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
   optional_white_space: () => '',
   one_or_more_white_space: () => '',
   divider: () => '',
-  command: ({ value }) => value,
-  command_value_set_group: ({ transformedValue: [command, ...coordinates] = [] }) => ({
+  command: ({ value }) => ({ command: value, coordinates: [] }),
+  command_value_set_group: ({ transformedValue: [{ command }, ...coordinates] = [] }) => ({
     command,
     coordinates: flattenAndClean(coordinates).map((c: string) => parseFloat(c)),
   }),
