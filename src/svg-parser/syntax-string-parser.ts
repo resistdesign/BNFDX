@@ -336,3 +336,28 @@ export const parseSyntaxString = <TokenTypes extends string>(syntaxString: strin
 
   return processTokenValidator<TokenTypes>(syntaxString, entry, entry, map, 0);
 };
+
+export type ASTWithTransformedValue<TokenTypes extends string> = AST<TokenTypes> & {
+  transformedValue: any;
+};
+
+export type ASTTransform<TokenTypes extends string> = (astWithTransformedValue: ASTWithTransformedValue<TokenTypes>, valueIndex: number) => any;
+
+export type ASTTransformMap<TokenTypes extends string> = {
+  [type in TokenTypes]: ASTTransform<TokenTypes>;
+};
+
+export const transformAST = <TokenTypes extends string>(
+  ast: AST<TokenTypes>,
+  transformMap: ASTTransformMap<TokenTypes>,
+  valueIndex: number = 0
+): ASTWithTransformedValue<TokenTypes> | any => {
+  const { tokenType, value } = ast;
+  const transform: ASTTransform<TokenTypes> | undefined = transformMap[tokenType];
+  const astWithTransformedValue: ASTWithTransformedValue<TokenTypes> = {
+    ...ast,
+    transformedValue: value instanceof Array ? value.map((vAST, i) => transformAST<TokenTypes>(vAST, transformMap, i)) : value,
+  };
+
+  return transform ? transform(astWithTransformedValue, valueIndex) : astWithTransformedValue;
+};
