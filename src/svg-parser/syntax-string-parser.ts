@@ -233,7 +233,6 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
   },
 };
 
-const afterCommandC: string[] = [];
 const processTokenValidator: TokenValidationProcessor = <TokenTypes extends string>(
   syntaxString: string = '',
   tokenType: TokenTypes,
@@ -332,10 +331,6 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
         break;
       }
     }
-
-    if (tokenValidator === 'optional_white_space') {
-      afterCommandC.push(`${tokenValidator}: ${!!ast}, ${currentIndex}`);
-    }
   }
 
   return ast;
@@ -344,9 +339,5 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
 export const parseSyntaxString = <TokenTypes extends string>(syntaxString: string = '', grammar: Grammar<TokenTypes>): AST<TokenTypes> | false => {
   const { entry, map } = grammar;
 
-  const result = processTokenValidator<TokenTypes>(syntaxString, entry, entry, map, 0);
-
-  console.log('AFTER COMMAND C:', afterCommandC.join(', '));
-
-  return result;
+  return processTokenValidator<TokenTypes>(syntaxString, entry, entry, map, 0);
 };
