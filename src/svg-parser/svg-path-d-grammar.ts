@@ -53,7 +53,7 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
   },
   decimal: { options: [/\./] },
   operator: { options: [/\+/, /-/] },
-  divider: { options: [/,/, 'one_or_more_white_space', 'operator', 'decimal'] },
+  divider: { options: [/,/, 'one_or_more_white_space'] },
   value: {
     options: [
       'digit_set',

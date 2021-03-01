@@ -63,11 +63,13 @@ const PROCESS_REGEX: TokenValidationProcessor = <TokenTypes extends string>(
       // TRICKY: IMPORTANT: Make sure the match is at the beginning of the string being searched.
       // WARNING: Unwanted recursion could occur without this check.
       if (!!firstMatch && stringFromIndex.indexOf(firstMatch) === 0) {
+        const valueLength = firstMatch.length;
+
         return {
           startIndex: currentIndex,
-          endIndex: currentIndex + (firstMatch.length - 1),
+          endIndex: valueLength === 0 ? currentIndex : currentIndex + valueLength - 1,
           value: firstMatch,
-          valueLength: firstMatch.length,
+          valueLength,
           tokenType,
         };
       }
@@ -106,6 +108,8 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
       }
     }
 
+    const valueLength = results.reduce((acc, { valueLength: vL }) => acc + vL, 0);
+
     return results.length > 0
       ? results.length === 1
         ? // ONE RESULT
@@ -113,9 +117,9 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
         : // MULTIPLE RESULTS
           {
             startIndex: currentIndex,
-            endIndex: latestCurrentIndex - 1,
+            endIndex: valueLength === 0 ? currentIndex : currentIndex + valueLength - 1,
             value: results,
-            valueLength: results.reduce((acc, { valueLength: vL }) => acc + vL, 0),
+            valueLength,
             tokenType: tokenType,
           }
       : // IMPORTANT: This processor is ALWAYS VALID, but it can return an "empty" result.
@@ -157,6 +161,8 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
       }
     }
 
+    const valueLength = results.reduce((acc, { valueLength: vL }) => acc + vL, 0);
+
     return results.length > 0
       ? results.length === 1
         ? // ONE RESULT
@@ -164,9 +170,9 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
         : // MULTIPLE RESULTS
           {
             startIndex: currentIndex,
-            endIndex: latestCurrentIndex - 1,
+            endIndex: valueLength === 0 ? currentIndex : currentIndex + valueLength - 1,
             value: results,
-            valueLength: results.reduce((acc, { valueLength: vL }) => acc + vL, 0),
+            valueLength,
             tokenType: tokenType,
           }
       : // IMPORTANT: This processor is ONLY VALID if there is AT LEAST ONE result.
@@ -227,6 +233,7 @@ const TOKEN_VALIDATOR_OPTION_PROCESSORS: TokenValidatorOptionProcessorMap = {
   },
 };
 
+const afterCommandC: string[] = [];
 const processTokenValidator: TokenValidationProcessor = <TokenTypes extends string>(
   syntaxString: string = '',
   tokenType: TokenTypes,
@@ -274,6 +281,8 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
           }
         }
 
+        const valueLength = resultList.reduce((acc, { valueLength: vL }) => acc + vL, 0);
+
         if (!missMatch) {
           ast =
             resultList.length === 1
@@ -282,9 +291,9 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
               : // MULTIPLE TOKEN TYPES WITH MULTIPLE RESULTS
                 {
                   startIndex: currentIndex,
-                  endIndex: latestCurrentIndex - 1,
+                  endIndex: valueLength === 0 ? currentIndex : currentIndex + valueLength - 1,
                   value: resultList,
-                  valueLength: resultList.reduce((acc, { valueLength: vL }) => acc + vL, 0),
+                  valueLength,
                   tokenType,
                 };
         }
@@ -323,6 +332,10 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
         break;
       }
     }
+
+    if (tokenValidator === 'optional_white_space') {
+      afterCommandC.push(`${tokenValidator}: ${!!ast}, ${currentIndex}`);
+    }
   }
 
   return ast;
@@ -331,5 +344,9 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
 export const parseSyntaxString = <TokenTypes extends string>(syntaxString: string = '', grammar: Grammar<TokenTypes>): AST<TokenTypes> | false => {
   const { entry, map } = grammar;
 
-  return processTokenValidator<TokenTypes>(syntaxString, entry, entry, map, 0);
+  const result = processTokenValidator<TokenTypes>(syntaxString, entry, entry, map, 0);
+
+  console.log('AFTER COMMAND C:', afterCommandC.join(', '));
+
+  return result;
 };
