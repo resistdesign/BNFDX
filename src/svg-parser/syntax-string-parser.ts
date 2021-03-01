@@ -44,7 +44,7 @@ type TokenValidatorOptionProcessorMap = {
   [key in TokenProcessorOptionTypes]: TokenValidationProcessor;
 };
 
-const IS_END_OF_INPUT = (syntaxString: string = '', currentIndex: number = 0) => currentIndex >= syntaxString.length - 1;
+const IS_END_OF_INPUT = (syntaxString: string = '', currentIndex: number = 0) => currentIndex >= syntaxString.length;
 
 const PROCESS_REGEX: TokenValidationProcessor = <TokenTypes extends string>(
   syntaxString: string,
