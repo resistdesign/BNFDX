@@ -71,7 +71,7 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     options: [/[mzlhvcsqtaMZLHVCSQTA]/i],
   },
   command_value_set_group: {
-    options: ['command', ['command', 'optional_white_space', 'value_set']],
+    options: ['command', ['command', 'optional_white_space', 'value_set'], ['command', 'optional_white_space', 'command_value_set_group']],
   },
 };
 
