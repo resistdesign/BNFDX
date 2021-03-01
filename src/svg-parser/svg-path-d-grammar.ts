@@ -80,14 +80,25 @@ export const SVGPathDGrammar: Grammar<SVGPathDTokenTypes> = {
   map: SVGPathDGrammarMap,
 };
 
+const flattenAndClean = (value: any[] | any): typeof value =>
+  value instanceof Array
+    ? value.reduce(
+        (acc, subValue) => (subValue instanceof Array ? [...acc, ...flattenAndClean(subValue)] : subValue === '' ? acc : [...acc, subValue]),
+        []
+      )
+    : value;
+
 export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
   white_space: () => '',
   optional_white_space: () => '',
   one_or_more_white_space: () => '',
   divider: () => '',
   command: ({ value }) => value,
-  command_value_set_group: ({ transformedValue: [command, ...coordinates] = [] }) => ({ command, coordinates }),
-  input: ({ transformedValue }) => transformedValue,
+  command_value_set_group: ({ transformedValue: [command, ...coordinates] = [] }) => ({
+    command,
+    coordinates: flattenAndClean(coordinates),
+  }),
+  input: ({ transformedValue }) => flattenAndClean(transformedValue),
   operator: ({ value }) => value,
   decimal: ({ value }) => value,
   digit: ({ value }) => value,

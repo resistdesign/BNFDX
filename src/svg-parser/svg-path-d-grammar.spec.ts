@@ -9,8 +9,6 @@ const PATH_D_AST = parseSyntaxString<SVGPathDTokenTypes>(DEMO_PATH_D, SVGPathDGr
 describe('SVG Parser', () => {
   describe('SVG Path D Grammar', () => {
     test('should enable parsing of path d commands', () => {
-      console.log('SVG Path D AST:', JSON.stringify(PATH_D_AST, null, 2));
-
       expect(PATH_D_AST).toBeTruthy();
     });
   });
