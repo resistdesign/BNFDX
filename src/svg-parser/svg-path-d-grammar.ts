@@ -96,13 +96,13 @@ export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
   command: ({ value }) => value,
   command_value_set_group: ({ transformedValue: [command, ...coordinates] = [] }) => ({
     command,
-    coordinates: flattenAndClean(coordinates),
+    coordinates: flattenAndClean(coordinates).map((c: string) => parseFloat(c)),
   }),
   input: ({ transformedValue }) => flattenAndClean(transformedValue),
   operator: ({ value }) => value,
   decimal: ({ value }) => value,
   digit: ({ value }) => value,
   digit_set: ({ transformedValue = [] }) => transformedValue.join(''),
-  value: ({ transformedValue = [] }) => parseFloat(transformedValue.join('')),
+  value: ({ transformedValue = [] }) => transformedValue.join(''),
   value_set: ({ transformedValue = [] }) => transformedValue,
 };
