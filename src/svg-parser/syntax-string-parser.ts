@@ -264,13 +264,8 @@ const processTokenValidator: TokenValidationProcessor = <TokenTypes extends stri
 
             resultList.push(result);
 
-            if (IS_END_OF_INPUT(syntaxString, latestCurrentIndex)) {
-              // IMPORTANT: There is not a full match for this token type combination if not all parts of the
-              // `tokenValidator` were available before the end of the input.
-              missMatch = resultList.length < tokenValidator.length;
-
-              break;
-            }
+            // TRICKY: IMPORTANT: Do NOT test for the end of the input because
+            // OPTIONAL token validators might fail incorrectly.
           } else {
             // IMPORTANT: There was a MATCH MISS and this combination of token types is INVALID.
             ast = false;
