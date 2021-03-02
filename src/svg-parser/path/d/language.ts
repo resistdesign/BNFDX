@@ -1,5 +1,17 @@
 import { ASTTransformMap, BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from '../../../utils/syntax-string-parser';
-import { MoveToCommand, SVGPathDCommand } from './command-types';
+import {
+  ClosePathCommand,
+  CurveToCommand,
+  EllipticalArcCommand,
+  HorizontalLineToCommand,
+  LineToCommand,
+  MoveToCommand,
+  QuadraticBezierCurveToCommand,
+  SmoothCurveToCommand,
+  SmoothQuadraticBezierCurveToCommand,
+  SVGPathDCommand,
+  VerticalLineToCommand,
+} from './command-types';
 
 export type SVGPathDTokenTypes =
   | 'input'
@@ -89,13 +101,18 @@ const flattenAndClean = (value: any[] | any): typeof value =>
       )
     : value;
 
+type SVGPathDRelativeCommandTypes = 'm' | 'z' | 'l' | 'h' | 'v' | 'c' | 's' | 'q' | 't' | 'a';
+type SVGPathDAbsoluteCommandTypes = 'M' | 'Z' | 'L' | 'H' | 'V' | 'C' | 'S' | 'Q' | 'T' | 'A';
+type SVGPathDCommandTypes = SVGPathDRelativeCommandTypes | SVGPathDAbsoluteCommandTypes;
 type UntypedSVGPathDCommand = {
-  command: 'm' | 'z' | 'l' | 'h' | 'v' | 'c' | 's' | 'q' | 't' | 'a' | 'M' | 'Z' | 'L' | 'H' | 'V' | 'C' | 'S' | 'Q' | 'T' | 'A';
+  command: SVGPathDCommandTypes;
   coordinates: number[];
 };
 type UntypedSVGPathDCommandConverter = (untypedCommand: UntypedSVGPathDCommand) => SVGPathDCommand;
 
-const BASE_COMMAND_MAP = {
+const SVG_PATH_D_TYPED_COMMAND_MAP: {
+  [type in SVGPathDRelativeCommandTypes]: UntypedSVGPathDCommandConverter;
+} = {
   m: ({ command, coordinates }): MoveToCommand => {
     const newCoordinates: { x: number; y: number }[] = [];
 
@@ -110,20 +127,23 @@ const BASE_COMMAND_MAP = {
     }
 
     return {
-      command,
+      command: command as any,
       coordinates: newCoordinates,
     };
   },
-};
-const SVG_PATH_D_TYPED_COMMAND_MAP: {
-  [type in UntypedSVGPathDCommand['command']]: UntypedSVGPathDCommandConverter;
-} = {
-  m: BASE_COMMAND_MAP.m,
-  M: BASE_COMMAND_MAP.m,
+  z: ({ command, coordinates }): ClosePathCommand => {},
+  l: ({ command, coordinates }): LineToCommand => {},
+  h: ({ command, coordinates }): HorizontalLineToCommand => {},
+  v: ({ command, coordinates }): VerticalLineToCommand => {},
+  c: ({ command, coordinates }): CurveToCommand => {},
+  s: ({ command, coordinates }): SmoothCurveToCommand => {},
+  q: ({ command, coordinates }): QuadraticBezierCurveToCommand => {},
+  t: ({ command, coordinates }): SmoothQuadraticBezierCurveToCommand => {},
+  a: ({ command, coordinates }): EllipticalArcCommand => {},
 };
 
 const getTypedSVGPathDCommand = (untypedCommand: UntypedSVGPathDCommand): SVGPathDCommand =>
-  SVG_PATH_D_TYPED_COMMAND_MAP[untypedCommand.command](untypedCommand);
+  SVG_PATH_D_TYPED_COMMAND_MAP[untypedCommand.command.toLowerCase() as SVGPathDRelativeCommandTypes](untypedCommand);
 
 export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
   white_space: () => '',
