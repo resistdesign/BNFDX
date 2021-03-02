@@ -1,4 +1,5 @@
 import { ASTTransformMap, BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from '../../../utils/syntax-string-parser';
+import { MoveToCommand, SVGPathDCommand } from './command-types';
 
 export type SVGPathDTokenTypes =
   | 'input'
@@ -88,16 +89,53 @@ const flattenAndClean = (value: any[] | any): typeof value =>
       )
     : value;
 
+type UntypedSVGPathDCommand = {
+  command: 'm' | 'z' | 'l' | 'h' | 'v' | 'c' | 's' | 'q' | 't' | 'a' | 'M' | 'Z' | 'L' | 'H' | 'V' | 'C' | 'S' | 'Q' | 'T' | 'A';
+  coordinates: number[];
+};
+type UntypedSVGPathDCommandConverter = (untypedCommand: UntypedSVGPathDCommand) => SVGPathDCommand;
+
+const BASE_COMMAND_MAP = {
+  m: ({ command, coordinates }): MoveToCommand => {
+    const newCoordinates: { x: number; y: number }[] = [];
+
+    let coordList = coordinates;
+
+    while (coordList.length) {
+      const [x = 0, y = 0, ...more] = coordList;
+
+      newCoordinates.push({ x, y });
+
+      coordList = more;
+    }
+
+    return {
+      command,
+      coordinates: newCoordinates,
+    };
+  },
+};
+const SVG_PATH_D_TYPED_COMMAND_MAP: {
+  [type in UntypedSVGPathDCommand['command']]: UntypedSVGPathDCommandConverter;
+} = {
+  m: BASE_COMMAND_MAP.m,
+  M: BASE_COMMAND_MAP.m,
+};
+
+const getTypedSVGPathDCommand = (untypedCommand: UntypedSVGPathDCommand): SVGPathDCommand =>
+  SVG_PATH_D_TYPED_COMMAND_MAP[untypedCommand.command](untypedCommand);
+
 export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
   white_space: () => '',
   optional_white_space: () => '',
   one_or_more_white_space: () => '',
   divider: () => '',
-  command: ({ value }) => ({ command: value, coordinates: [] }),
-  command_value_set_group: ({ transformedValue: [{ command }, ...coordinates] = [] }) => ({
-    command,
-    coordinates: flattenAndClean(coordinates).map((c: string) => parseFloat(c)),
-  }),
+  command: ({ value }) => getTypedSVGPathDCommand({ command: value, coordinates: [] }),
+  command_value_set_group: ({ transformedValue: [{ command }, ...coordinates] = [] }) =>
+    getTypedSVGPathDCommand({
+      command,
+      coordinates: flattenAndClean(coordinates).map((c: string) => parseFloat(c)),
+    }),
   input: ({ transformedValue }) => flattenAndClean(transformedValue),
   operator: ({ value }) => value,
   decimal: ({ value }) => value,
