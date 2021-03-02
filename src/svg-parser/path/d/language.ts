@@ -1,4 +1,4 @@
-import { ASTTransformMap, BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from './syntax-string-parser';
+import { ASTTransformMap, BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from '../../../utils/syntax-string-parser';
 
 export type SVGPathDTokenTypes =
   | 'input'

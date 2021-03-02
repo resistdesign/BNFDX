@@ -1,9 +1,9 @@
 import Path from 'path';
 import FS from 'fs';
-import { AST, astToSyntaxString, parseSyntaxString, transformAST } from './syntax-string-parser';
-import { SVGPathDASTTransformMap, SVGPathDGrammar, SVGPathDTokenTypes } from './svg-path-d-grammar';
+import { AST, astToSyntaxString, parseSyntaxString, transformAST } from '../../../utils/syntax-string-parser';
+import { SVGPathDASTTransformMap, SVGPathDGrammar, SVGPathDTokenTypes } from './language';
 
-const DEMO_PATH_D: string = FS.readFileSync(Path.join(__dirname, 'demo-path-d.txt'), { encoding: 'utf8' });
+const DEMO_PATH_D: string = FS.readFileSync(Path.join(__dirname, 'mock-data.txt'), { encoding: 'utf8' });
 const PATH_D_AST = parseSyntaxString<SVGPathDTokenTypes>(DEMO_PATH_D, SVGPathDGrammar);
 
 describe('SVG Parser', () => {
