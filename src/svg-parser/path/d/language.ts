@@ -108,49 +108,138 @@ type UntypedSVGPathDCommand = {
   command: SVGPathDCommandTypes;
   coordinates: number[];
 };
-type UntypedSVGPathDCommandConverter = (untypedCommand: UntypedSVGPathDCommand) => SVGPathDCommand;
+type SVGPathDCommandCoordinateType<CommandType extends SVGPathDCommand> = CommandType['coordinates'] extends Array<infer T> ? T : any;
+type UntypedSVGPathDCoordinateConverterValues<CommandType extends SVGPathDCommand> = {
+  coordSet: SVGPathDCommandCoordinateType<CommandType> | undefined;
+  remainingCoords: number[];
+};
+type UntypedSVGPathDCoordinateConverter<CommandType extends SVGPathDCommand> = (
+  coordinates: number[]
+) => UntypedSVGPathDCoordinateConverterValues<CommandType>;
 
 const SVG_PATH_D_TYPED_COMMAND_MAP: {
-  [type in SVGPathDRelativeCommandTypes]: UntypedSVGPathDCommandConverter;
+  [type in SVGPathDRelativeCommandTypes]: UntypedSVGPathDCoordinateConverter<SVGPathDCommand>;
 } = {
-  m: ({ command, coordinates }): MoveToCommand => {
-    const newCoordinates: { x: number; y: number }[] = [];
-
-    let coordList = coordinates;
-
-    while (coordList.length) {
-      const [x = 0, y = 0, ...more] = coordList;
-
-      newCoordinates.push({ x, y });
-
-      coordList = more;
-    }
-
-    return {
-      command: command as any,
-      coordinates: newCoordinates,
-    };
-  },
-  z: ({ command, coordinates }): ClosePathCommand => {},
-  l: ({ command, coordinates }): LineToCommand => {},
-  h: ({ command, coordinates }): HorizontalLineToCommand => {},
-  v: ({ command, coordinates }): VerticalLineToCommand => {},
-  c: ({ command, coordinates }): CurveToCommand => {},
-  s: ({ command, coordinates }): SmoothCurveToCommand => {},
-  q: ({ command, coordinates }): QuadraticBezierCurveToCommand => {},
-  t: ({ command, coordinates }): SmoothQuadraticBezierCurveToCommand => {},
-  a: ({ command, coordinates }): EllipticalArcCommand => {},
+  m: ([x, y, ...remainingCoords]): UntypedSVGPathDCoordinateConverterValues<MoveToCommand> => ({
+    coordSet: {
+      x,
+      y,
+    },
+    remainingCoords,
+  }),
+  z: (remainingCoords): UntypedSVGPathDCoordinateConverterValues<ClosePathCommand> => ({
+    coordSet: undefined as never,
+    remainingCoords,
+  }),
+  l: ([x, y, ...remainingCoords]): UntypedSVGPathDCoordinateConverterValues<LineToCommand> => ({
+    coordSet: {
+      x,
+      y,
+    },
+    remainingCoords,
+  }),
+  h: ([x, ...remainingCoords]): UntypedSVGPathDCoordinateConverterValues<HorizontalLineToCommand> => ({
+    coordSet: {
+      x,
+    },
+    remainingCoords,
+  }),
+  v: ([y, ...remainingCoords]): UntypedSVGPathDCoordinateConverterValues<VerticalLineToCommand> => ({
+    coordSet: {
+      y,
+    },
+    remainingCoords,
+  }),
+  c: ([x1, y1, x2, y2, x, y, ...remainingCoords]): UntypedSVGPathDCoordinateConverterValues<CurveToCommand> => ({
+    coordSet: {
+      x1,
+      y1,
+      x2,
+      y2,
+      x,
+      y,
+    },
+    remainingCoords,
+  }),
+  s: ([x2, y2, x, y, ...remainingCoords]): UntypedSVGPathDCoordinateConverterValues<SmoothCurveToCommand> => ({
+    coordSet: {
+      x2,
+      y2,
+      x,
+      y,
+    },
+    remainingCoords,
+  }),
+  q: ([x1, y1, x, y, ...remainingCoords]): UntypedSVGPathDCoordinateConverterValues<QuadraticBezierCurveToCommand> => ({
+    coordSet: {
+      x1,
+      y1,
+      x,
+      y,
+    },
+    remainingCoords,
+  }),
+  t: ([x, y, ...remainingCoords]): UntypedSVGPathDCoordinateConverterValues<SmoothQuadraticBezierCurveToCommand> => ({
+    coordSet: {
+      x,
+      y,
+    },
+    remainingCoords,
+  }),
+  a: ([
+    rx,
+    ry,
+    xAxisRotation,
+    largeArcFlag,
+    sweepFlag,
+    x,
+    y,
+    ...remainingCoords
+  ]): UntypedSVGPathDCoordinateConverterValues<EllipticalArcCommand> => ({
+    coordSet: {
+      rx,
+      ry,
+      xAxisRotation,
+      largeArcFlag,
+      sweepFlag,
+      x,
+      y,
+    },
+    remainingCoords,
+  }),
 };
 
-const getTypedSVGPathDCommand = (untypedCommand: UntypedSVGPathDCommand): SVGPathDCommand =>
-  SVG_PATH_D_TYPED_COMMAND_MAP[untypedCommand.command.toLowerCase() as SVGPathDRelativeCommandTypes](untypedCommand);
+const getTypedSVGPathDCommand = ({ command, coordinates = [] }: UntypedSVGPathDCommand): SVGPathDCommand => {
+  const newCoordinates: any[] = [];
+  const coordConverter = SVG_PATH_D_TYPED_COMMAND_MAP[command.toLowerCase() as SVGPathDRelativeCommandTypes];
+
+  let coordList = coordinates;
+
+  while (coordList.length) {
+    const { coordSet, remainingCoords } = coordConverter(coordList);
+
+    if (coordSet) {
+      newCoordinates.push(coordSet);
+    } else {
+      // TRICKY: If there is no coordSet then this coordinates array should be empty.
+      break;
+    }
+
+    coordList = remainingCoords;
+  }
+
+  return {
+    command: command as any,
+    coordinates: newCoordinates,
+  };
+};
 
 export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
   white_space: () => '',
   optional_white_space: () => '',
   one_or_more_white_space: () => '',
   divider: () => '',
-  command: ({ value }) => getTypedSVGPathDCommand({ command: value, coordinates: [] }),
+  command: ({ value }) => getTypedSVGPathDCommand({ command: value as SVGPathDCommandTypes, coordinates: [] }),
   command_value_set_group: ({ transformedValue: [{ command }, ...coordinates] = [] }) =>
     getTypedSVGPathDCommand({
       command,
