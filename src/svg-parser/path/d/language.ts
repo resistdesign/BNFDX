@@ -68,6 +68,7 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
   operator: { options: [/\+/, /-/] },
   divider: { options: [/,/, 'one_or_more_white_space'] },
   value: {
+    // TODO: Add exponents.
     options: [
       'digit_set',
       ['digit_set', 'decimal', 'digit_set'],
