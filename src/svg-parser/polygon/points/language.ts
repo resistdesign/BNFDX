@@ -1,4 +1,4 @@
-import { BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from '../../../utils/syntax-string-parser';
+import { ASTTransformMap, BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from '../../../utils/syntax-string-parser';
 
 export type SVGPolygonPointsTokenTypes =
   | 'list_of_points'
@@ -90,4 +90,23 @@ const SVGPolygonPointsGrammarMap: BaseGrammarMapType<SVGPolygonPointsTokenTypes>
 export const SVGPolygonPointsGrammar: Grammar<SVGPolygonPointsTokenTypes> = {
   entry: 'list_of_points',
   map: SVGPolygonPointsGrammarMap,
+};
+
+export const SVGPolygonPointsASTTransformMap: ASTTransformMap<SVGPolygonPointsTokenTypes> = {
+  list_of_points: ({ transformedValue = [] }) => transformedValue,
+  coordinate_pairs: ({ transformedValue = [] }) => transformedValue,
+  coordinate_pair: ({ transformedValue: [x, y] = [] }) => ({ x, y }),
+  coordinate: ({ transformedValue = [] }) => parseFloat(transformedValue.join('')),
+  number: ({ transformedValue = [] }) => transformedValue.join(''),
+  negative_coordinate: ({ transformedValue = [] }) => transformedValue.join(''),
+  comma_wsp: () => '',
+  comma: () => '',
+  integer_constant: ({ transformedValue = [] }) => transformedValue.join(''),
+  floating_point_constant: ({ transformedValue = [] }) => transformedValue.join(''),
+  fractional_constant: ({ transformedValue = [] }) => transformedValue.join(''),
+  exponent: ({ transformedValue = [] }) => transformedValue.join(''),
+  sign: ({ value }) => value,
+  digit_sequence: ({ transformedValue = [] }) => transformedValue.join(''),
+  digit: ({ value }) => value,
+  wsp: () => '',
 };

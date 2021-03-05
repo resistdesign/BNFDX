@@ -12,6 +12,7 @@ import {
   SVGPathDCommand,
   VerticalLineToCommand,
 } from './command-types';
+import { flattenAndClean } from '../../common/transform-utils';
 
 export type SVGPathDTokenTypes =
   | 'input'
@@ -93,14 +94,6 @@ export const SVGPathDGrammar: Grammar<SVGPathDTokenTypes> = {
   entry: 'input',
   map: SVGPathDGrammarMap,
 };
-
-const flattenAndClean = (value: any[] | any): typeof value =>
-  value instanceof Array
-    ? value.reduce(
-        (acc, subValue) => (subValue instanceof Array ? [...acc, ...flattenAndClean(subValue)] : subValue === '' ? acc : [...acc, subValue]),
-        []
-      )
-    : value;
 
 type SVGPathDRelativeCommandTypes = 'm' | 'z' | 'l' | 'h' | 'v' | 'c' | 's' | 'q' | 't' | 'a';
 type SVGPathDAbsoluteCommandTypes = 'M' | 'Z' | 'L' | 'H' | 'V' | 'C' | 'S' | 'Q' | 'T' | 'A';

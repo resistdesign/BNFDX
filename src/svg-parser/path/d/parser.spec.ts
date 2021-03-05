@@ -10,8 +10,6 @@ describe('parser', () => {
     const result: SVGPathDCommand[] = svgPathDParser(MOCK_DATA) as SVGPathDCommand[];
     const [{ command: m1 }, { command: c1 }, { command: l1 }, { command: c2 }, { command: z1 }] = result;
 
-    console.log(JSON.stringify(result));
-
     expect(result).toHaveLength(5);
     expect(m1).toStrictEqual('m');
     expect(c1).toStrictEqual('c');
