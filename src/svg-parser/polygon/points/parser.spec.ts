@@ -16,6 +16,6 @@ describe('parser', () => {
     expect(skip2).toBeInstanceOf(Object);
     expect(skip3).toBeInstanceOf(Object);
     expect(x4).toStrictEqual(2e2);
-    expect(y4).toStrictEqual(90);
+    expect(y4).toStrictEqual(90e44);
   });
 });

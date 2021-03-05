@@ -1,4 +1,5 @@
 import { ASTTransformMap, BaseGrammarMapType, Grammar, TokenProcessorOptionTypes } from '../../../utils/syntax-string-parser';
+import { flattenAndClean } from '../../common/transform-utils';
 
 export type SVGPolygonPointsTokenTypes =
   | 'list_of_points'
@@ -93,20 +94,25 @@ export const SVGPolygonPointsGrammar: Grammar<SVGPolygonPointsTokenTypes> = {
 };
 
 export const SVGPolygonPointsASTTransformMap: ASTTransformMap<SVGPolygonPointsTokenTypes> = {
-  list_of_points: ({ transformedValue = [] }) => transformedValue,
+  list_of_points: ({ transformedValue = [] }) => flattenAndClean(transformedValue),
   coordinate_pairs: ({ transformedValue = [] }) => transformedValue,
-  coordinate_pair: ({ transformedValue: [x, y] = [] }) => ({ x, y }),
-  coordinate: ({ transformedValue = [] }) => parseFloat(transformedValue.join('')),
-  number: ({ transformedValue = [] }) => transformedValue.join(''),
-  negative_coordinate: ({ transformedValue = [] }) => transformedValue.join(''),
+  coordinate_pair: ({ transformedValue = [] }) => {
+    const clean = flattenAndClean(transformedValue);
+    const [x = 0, y = 0] = clean instanceof Array ? clean : [];
+
+    return { x: parseFloat(x), y: parseFloat(y) };
+  },
+  coordinate: ({ transformedValue }) => (transformedValue instanceof Array ? transformedValue.join('') : transformedValue),
+  number: ({ transformedValue }) => (transformedValue instanceof Array ? transformedValue.join('') : transformedValue),
+  negative_coordinate: ({ transformedValue }) => (transformedValue instanceof Array ? transformedValue.join('') : transformedValue),
   comma_wsp: () => '',
   comma: () => '',
-  integer_constant: ({ transformedValue = [] }) => transformedValue.join(''),
-  floating_point_constant: ({ transformedValue = [] }) => transformedValue.join(''),
-  fractional_constant: ({ transformedValue = [] }) => transformedValue.join(''),
-  exponent: ({ transformedValue = [] }) => transformedValue.join(''),
+  integer_constant: ({ transformedValue }) => transformedValue,
+  floating_point_constant: ({ transformedValue }) => (transformedValue instanceof Array ? transformedValue.join('') : transformedValue),
+  fractional_constant: ({ transformedValue }) => (transformedValue instanceof Array ? transformedValue.join('') : transformedValue),
+  exponent: ({ transformedValue }) => (transformedValue instanceof Array ? flattenAndClean(transformedValue).join('') : `${transformedValue}`),
   sign: ({ value }) => value,
-  digit_sequence: ({ transformedValue = [] }) => transformedValue.join(''),
+  digit_sequence: ({ transformedValue }) => transformedValue.join(''),
   digit: ({ value }) => value,
   wsp: () => '',
 };
