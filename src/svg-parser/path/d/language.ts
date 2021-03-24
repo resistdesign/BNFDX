@@ -12,7 +12,7 @@ import {
   SVGPathDCommand,
   VerticalLineToCommand,
 } from './command-types';
-// import { flattenAndClean } from '../../common/transform-utils';
+import { flattenAndClean } from '../../common/transform-utils';
 
 export type SVGPathDTokenTypes =
   | 'svg-path'
@@ -98,7 +98,17 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     ],
   },
   'drawto-commands': {
-    options: ['drawto-command', ['drawto-command', { value: 'wsp', option: TokenProcessorOptionTypes.ZERO_OR_MORE }, 'drawto-commands']],
+    options: [
+      'drawto-command',
+      [
+        'drawto-command',
+        {
+          value: 'wsp',
+          option: TokenProcessorOptionTypes.ZERO_OR_MORE,
+        },
+        'drawto-commands',
+      ],
+    ],
   },
   'drawto-command': {
     options: [
@@ -199,7 +209,16 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     ],
   },
   curveto: {
-    options: [[/[c]/i, { value: 'wsp', option: TokenProcessorOptionTypes.ZERO_OR_MORE }, 'curveto-argument-sequence']],
+    options: [
+      [
+        /[c]/i,
+        {
+          value: 'wsp',
+          option: TokenProcessorOptionTypes.ZERO_OR_MORE,
+        },
+        'curveto-argument-sequence',
+      ],
+    ],
   },
   'curveto-argument-sequence': {
     options: [
@@ -257,7 +276,16 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     ],
   },
   'smooth-curveto-argument': {
-    options: [['coordinate-pair', { value: 'comma-wsp', option: TokenProcessorOptionTypes.ZERO_OR_ONE }, 'coordinate-pair']],
+    options: [
+      [
+        'coordinate-pair',
+        {
+          value: 'comma-wsp',
+          option: TokenProcessorOptionTypes.ZERO_OR_ONE,
+        },
+        'coordinate-pair',
+      ],
+    ],
   },
   'quadratic-bezier-curveto': {
     options: [
@@ -282,7 +310,16 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
     ],
   },
   'quadratic-bezier-curveto-argument': {
-    options: [['coordinate-pair', { value: 'comma-wsp', option: TokenProcessorOptionTypes.ZERO_OR_ONE }, 'coordinate-pair']],
+    options: [
+      [
+        'coordinate-pair',
+        {
+          value: 'comma-wsp',
+          option: TokenProcessorOptionTypes.ZERO_OR_ONE,
+        },
+        'coordinate-pair',
+      ],
+    ],
   },
   'smooth-quadratic-bezier-curveto': {
     options: [
@@ -402,8 +439,8 @@ const SVGPathDGrammarMap: BaseGrammarMapType<SVGPathDTokenTypes> = {
   },
   'fractional-constant': {
     options: [
-      [{ value: 'digit-sequence', option: TokenProcessorOptionTypes.ZERO_OR_ONE }, /[.]/, 'digit-sequence'],
       ['digit-sequence', /[.]/],
+      [{ value: 'digit-sequence', option: TokenProcessorOptionTypes.ZERO_OR_ONE }, /[.]/, 'digit-sequence'],
     ],
   },
   exponent: {
@@ -559,24 +596,65 @@ const getTypedSVGPathDCommand = ({ command, coordinates = [] }: UntypedSVGPathDC
   };
 };
 
-export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
-  // wsp: () => '',
-  // comma: () => '',
-  // one_or_more_white_space: () => '',
-  // divider: () => '',
-  // command: ({ value }) => getTypedSVGPathDCommand({ command: value as SVGPathDCommandTypes, coordinates: [] }),
-  // command_value_set_group: ({ transformedValue: [{ command }, ...coordinates] = [] }) =>
-  //   getTypedSVGPathDCommand({
-  //     command,
-  //     coordinates: flattenAndClean(coordinates).map((c: string) => parseFloat(c)),
-  //   }),
-  // input: ({ transformedValue }) => flattenAndClean(transformedValue),
-  // operator: ({ value }) => value,
-  // decimal: ({ value }) => value,
-  // digit: ({ value }) => value,
-  // digit_set: ({ transformedValue = [] }) => transformedValue.join(''),
-  // value: ({ transformedValue = [] }) => transformedValue.join(''),
-  // value_set: ({ transformedValue = [] }) => transformedValue,
+const asNothing = () => '';
+const asValue = ({ value }: any) => value;
+const asTransformed = ({ transformedValue }: any) => transformedValue;
+const asTransformedFlattened = ({ transformedValue }: any) => flattenAndClean(transformedValue);
+const asTransformedAndJoined = ({ transformedValue }: any) => (transformedValue instanceof Array ? transformedValue.join('') : transformedValue);
+const asTransformedFlattenedAndJoined = ({ transformedValue }: any) =>
+  transformedValue instanceof Array ? flattenAndClean(transformedValue).join('') : transformedValue;
+const asCommand = ({ transformedValue }: any) => {
+  if (transformedValue instanceof Array) {
+    const [command, ...coordinates] = flattenAndClean(transformedValue);
+
+    return getTypedSVGPathDCommand({ command, coordinates });
+  } else {
+    return transformedValue;
+  }
 };
 
-getTypedSVGPathDCommand({ command: 'A', coordinates: [] });
+export const SVGPathDASTTransformMap: ASTTransformMap<SVGPathDTokenTypes> = {
+  'svg-path': asTransformedFlattened,
+  'moveto-drawto-command-groups': asTransformed,
+  'moveto-drawto-command-group': asTransformed,
+  'drawto-commands': asTransformed,
+  'drawto-command': asTransformed,
+  moveto: asCommand,
+  'moveto-argument-sequence': asTransformed,
+  closepath: ({ value }) => getTypedSVGPathDCommand({ command: value as any, coordinates: [] }),
+  lineto: asCommand,
+  'lineto-argument-sequence': asTransformed,
+  'horizontal-lineto': asCommand,
+  'horizontal-lineto-argument-sequence': asTransformed,
+  'vertical-lineto': asCommand,
+  'vertical-lineto-argument-sequence': asTransformed,
+  curveto: asCommand,
+  'curveto-argument-sequence': asTransformed,
+  'curveto-argument': asTransformed,
+  'smooth-curveto': asCommand,
+  'smooth-curveto-argument-sequence': asTransformed,
+  'smooth-curveto-argument': asTransformed,
+  'quadratic-bezier-curveto': asCommand,
+  'quadratic-bezier-curveto-argument-sequence': asTransformed,
+  'quadratic-bezier-curveto-argument': asTransformed,
+  'smooth-quadratic-bezier-curveto': asCommand,
+  'smooth-quadratic-bezier-curveto-argument-sequence': asTransformed,
+  'elliptical-arc': asCommand,
+  'elliptical-arc-argument-sequence': asTransformed,
+  'elliptical-arc-argument': asTransformed,
+  'coordinate-pair': asTransformedFlattened,
+  coordinate: asTransformed,
+  'nonnegative-number': asTransformed,
+  number: asTransformedFlattenedAndJoined,
+  flag: asValue,
+  'comma-wsp': asNothing,
+  comma: asNothing,
+  'integer-constant': asTransformedFlattenedAndJoined,
+  'floating-point-constant': asTransformedFlattenedAndJoined,
+  'fractional-constant': asTransformedFlattenedAndJoined,
+  exponent: asValue,
+  sign: asValue,
+  'digit-sequence': asTransformedAndJoined,
+  digit: asValue,
+  wsp: asNothing,
+};
