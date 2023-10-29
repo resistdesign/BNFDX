@@ -1,5 +1,5 @@
 {
-  "name": "@resistdesign/bnf-like",
+  "name": "@resistdesign/bnfdx",
   "description": "A BNF like parser that uses an object structure as input and includes transformation features.",
   "version": "1.0.0",
   "license": "MIT",
