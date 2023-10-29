@@ -1,3 +1,3 @@
-# React 3D Micro
+# BNF Like
 
-Lightweight, simple, SVG based 3D for React.
+A BNF like parser that uses an object structure as input and includes transformation features.

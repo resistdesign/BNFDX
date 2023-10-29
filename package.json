@@ -1,76 +1,17 @@
 {
-  "name": "@resistdesign/react-3d-micro",
-  "description": "Lightweight, simple, SVG based 3D for React.",
-  "version": "0.0.0",
+  "name": "@resistdesign/bnf-like",
+  "description": "A BNF like parser that uses an object structure as input and includes transformation features.",
+  "version": "1.0.0",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "engines": {
-    "node": ">=10"
-  },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test --testMatch \"$(pwd)/src/**/*.spec.{ts,tsx}\" --passWithNoTests",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
-  },
-  "peerDependencies": {
-    "react": ">=16"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
+    "start": "echo 'implement'",
+    "build": "echo 'implement'"
   },
   "prettier": {
-    "printWidth": 150,
+    "printWidth": 100,
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5",
     "bracketSpacing": true
-  },
-  "author": "Ryan Graff",
-  "module": "dist/react-3d-micro.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/react-3d-micro.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/react-3d-micro.esm.js",
-      "limit": "10 KB"
-    }
-  ],
-  "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@size-limit/preset-small-lib": "^4.9.2",
-    "@storybook/addon-essentials": "^6.1.18",
-    "@storybook/addon-info": "^5.3.21",
-    "@storybook/addon-links": "^6.1.18",
-    "@storybook/addons": "^6.1.18",
-    "@storybook/react": "^6.1.18",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
-    "babel-loader": "^8.2.2",
-    "husky": "^5.0.9",
-    "prettier": "^2.2.1",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-is": "^17.0.1",
-    "size-limit": "^4.9.2",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.1.0",
-    "typescript": "^4.1.5",
-    "yarn": "^1.22.10"
-  },
-  "dependencies": {}
+  }
 }
