@@ -3,9 +3,12 @@
   "description": "A BNF like parser that uses an object structure as input and includes transformation features.",
   "version": "1.0.0",
   "license": "MIT",
+  "repository": "git@github.com:resistdesign/BNFDX.git",
+  "author": "Ryanne Graff <ryantgraff@resistdesign.com>",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "echo 'implement'",
-    "build": "echo 'implement'"
+    "test": "jest",
+    "build": "tsc -outDir dist"
   },
   "prettier": {
     "printWidth": 100,
@@ -13,5 +16,12 @@
     "singleQuote": true,
     "trailingComma": "es5",
     "bracketSpacing": true
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.6",
+    "@types/node": "^20.8.9",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
   }
 }
