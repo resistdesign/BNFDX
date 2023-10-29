@@ -1,6 +1,4 @@
-# BNFDX
-
-![BNFDX](./src/Assets/ID/BNFDX%20Logo%202023.jpeg)
+![BNFDX](./src/Assets/ID/BNFDX%20Logo%202023.png)
 
 A BNF like parser that uses an object structure as input and includes transformation features.
 
