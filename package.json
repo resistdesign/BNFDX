@@ -1,11 +1,11 @@
 {
   "name": "bnfdx",
   "description": "A BNF like parser that uses an object structure as input and includes transformation features.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "repository": "git@github.com:resistdesign/BNFDX.git",
   "author": "Ryanne Graff <ryantgraff@resistdesign.com>",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/**/*"
